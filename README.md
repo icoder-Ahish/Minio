@@ -37,7 +37,7 @@ if bucket_name:
 
 In this example, we initialize a Minio client with the server URL, access key, and secret key. We then list all the buckets in the Minio server and display them in Streamlit. We also provide an input field for the user to enter the name of a bucket. If a bucket name is provided, we list all the objects in that bucket and display them in Streamlit.
 
-Note that you need to install the minio library to use this code snippet. You can install it using pip:
+#Note that you need to install the minio library to use this code snippet. You can install it using pip:
 
 pip install minio
 Also, make sure you have the correct access and secret keys to access your Minio server.
