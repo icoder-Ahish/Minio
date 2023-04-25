@@ -1,36 +1,32 @@
 import streamlit as st
-import boto3
-import pandas as pd
-from botocore.client import Config
+from minio import Minio
+from minio.error import ResponseError
 
-# Initialize S3 client
-s3 = boto3.client('s3',
-                  endpoint_url='http://192.168.29.20:9000',
-                  # endpoint_url='http://10.0.1.95:9000',
-                  aws_access_key_id='minioadmin',
-                  aws_secret_access_key='minioadmin',
-                  config=Config(signature_version='s3v4'),
-                  )
+# Initialize Minio client
+client = Minio(
+    "minio_server_url",
+    access_key="your_access_key",
+    secret_key="your_secret_key",
+    secure=False  # Set to True for secure (HTTPS) access
+)
 
-# Get bucket objects list
-bucket_name = 'streamlit'
-file_name = 'data.csv'
+# List all the buckets in the Minio server
+st.write("### Buckets:")
+try:
+    buckets = client.list_buckets()
+    for bucket in buckets:
+        st.write(f"- {bucket.name}")
+except ResponseError as err:
+    st.error(f"Minio error occurred: {err}")
 
-response = s3.get_object(Bucket=bucket_name, Key=file_name)
-df = pd.read_csv(response["Body"])
+# List all the objects in a bucket
+bucket_name = st.text_input("Enter bucket name:")
+if bucket_name:
+    st.write(f"### Objects in bucket {bucket_name}:")
+    try:
+        objects = client.list_objects(bucket_name)
+        for obj in objects:
+            st.write(f"- {obj.object_name}")
+    except ResponseError as err:
+        st.error(f"Minio error occurred: {err}")
 
-# Display DataFrame in Streamlit app
-st.write(df)
-
-# Download the file contents as a string
-# file_contents = s3.get_object(Bucket=bucket_name, Key=file_name)['Body'].read().decode('utf-8')
-#
-# # Display the file contents in Streamlit
-# st.write(file_contents)
-
-
-# bucket_objects = s3.list_objects(Bucket=bucket_name)
-
-# # Display bucket objects list
-# for obj in bucket_objects['Contents']:
-#     st.write(obj['Key'])
